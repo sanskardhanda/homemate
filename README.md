@@ -1,4 +1,4 @@
-# homebridge-tuya-homemate
+# homebridge-homemate
 
 A Homebridge plugin to add local support for **HomeMate 3+1 switches** — 3 light switches + 1 fan with 4-speed control — devices that aren't supported by the main homebridge-tuya plugin.
 
