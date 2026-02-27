@@ -2,8 +2,21 @@
 
 const HomeMate3Plus1Accessory = require('./accessories/HomeMate3Plus1Accessory');
 
-const PLUGIN_NAME = 'homebridge-tuya-homemate';
+const PLUGIN_NAME = 'homebridge-homemate';
 const PLATFORM_NAME = 'TuyaHomeMate';
+
+const HOMEMATE_LIGHTS = [
+  { name: 'Light 1', dp: 1 },
+  { name: 'Light 2', dp: 2 },
+  { name: 'Light 3', dp: 3 },
+];
+
+const HOMEMATE_FAN = {
+  name: 'Fan',
+  dpSwitch: 101,
+  dpSpeed: 102,
+  speedValues: ['level_1', 'level_2', 'level_3', 'level_4'],
+};
 
 module.exports = (homebridge) => {
   homebridge.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, TuyaHomematePlatform);
@@ -29,18 +42,25 @@ class TuyaHomematePlatform {
 
   _initDevices() {
     for (const deviceConfig of this.config.devices) {
-      if (!deviceConfig.id || !deviceConfig.key || !deviceConfig.ip) {
-        this.log.warn(`Device "${deviceConfig.name}" is missing id, key, or ip. Skipping.`);
+      if (!deviceConfig.id || !deviceConfig.key) {
+        this.log.warn(`Device "${deviceConfig.name}" is missing id or key. Skipping.`);
         continue;
       }
-      const acc = new HomeMate3Plus1Accessory(this.log, deviceConfig, this.api);
+
+      const fullConfig = {
+        ...deviceConfig,
+        version: '3.3',
+        lights: HOMEMATE_LIGHTS,
+        fan: HOMEMATE_FAN,
+      };
+
+      const acc = new HomeMate3Plus1Accessory(this.log, fullConfig, this.api);
       this.accessories.push(acc);
       this.api.publishExternalAccessories(PLUGIN_NAME, [acc.accessory]);
     }
   }
 
   configureAccessory(accessory) {
-    // Called for cached accessories — not heavily used here since we publish external
     this.accessories.push(accessory);
   }
 }
